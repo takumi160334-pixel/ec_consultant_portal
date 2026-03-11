@@ -107,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderDashboard(container) {
         if (newsData.length === 0) {
-            await loadJsonData('/data/news.json', newsData);
+            await loadJsonData('data/news.json', newsData);
         }
 
         if (newsData.length === 0) {
@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderManuals(container) {
         if (manualsData.length === 0) {
-            await loadJsonData('/data/manuals.json', manualsData);
+            await loadJsonData('data/manuals.json', manualsData);
         }
 
         let currentTheme = 'All';
@@ -187,7 +187,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderQuizzes(container) {
         if (quizzesData.length === 0) {
-            await loadJsonData('/data/quizzes.json', quizzesData);
+            await loadJsonData('data/quizzes.json', quizzesData);
         }
 
         let currentTheme = 'All';
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function renderCases(container) {
         if (casesData.length === 0) {
-            await loadJsonData('/data/cases.json', casesData);
+            await loadJsonData('data/cases.json', casesData);
         }
 
         let currentTheme = 'All';
