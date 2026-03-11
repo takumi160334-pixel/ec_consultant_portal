@@ -25,7 +25,11 @@ RSS_FEEDS = [
     {'url': 'https://note.com/hashtag/E%E3%82%B3%E3%83%9E%E3%83%BC%E3%82%B9/rss', 'name': 'note (Eコマース)'},
     {'url': 'https://note.com/hashtag/ChatGPT/rss', 'name': 'note (ChatGPT/LLM)'},
     {'url': 'https://note.com/hashtag/SNS%E3%83%9E%E3%83%BC%E3%82%B1%E3%83%86%E3%82%A3%E3%83%B3%E3%82%B0/rss', 'name': 'note (SNSマーケティング)'},
-    {'url': 'https://markezine.jp/rss/new/', 'name': 'MarkeZine (デジタルマーケティング)'}
+    {'url': 'https://markezine.jp/rss/new/', 'name': 'MarkeZine (デジタルマーケティング)'},
+    {'url': 'https://note.com/pala_kojima/m/m5ef2dede0629/rss', 'name': 'note (EC事業の現場)'},
+    {'url': 'https://www.ecmj.co.jp/column/feed/', 'name': 'ECマーケティング人財育成 (ECMJ)'},
+    {'url': 'https://www.commerce-design.net/blog/feed/', 'name': 'コマースデザイン EC研究所'},
+    {'url': 'https://www.commerce-design.net/blog-staff/feed/', 'name': 'コマースデザイン スタッフブログ'}
 ]
 
 def fetch_youtube_video_ids(channel_url):
