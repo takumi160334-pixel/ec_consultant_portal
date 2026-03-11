@@ -72,7 +72,7 @@ def process_raw_data():
     def exists(item_id, collection):
         return any(item.get('id') == item_id for item in collection)
 
-    items_to_process = raw_yt[:2] + raw_rss[:3] # Limit to top few items for testing/quota
+    items_to_process = raw_yt[:5] + raw_rss[:10] # Increased daily volume significantly (15 total)
 
     print(f"Processing {len(items_to_process)} raw items with Gemini in a single batch...")
 
@@ -93,12 +93,11 @@ def process_raw_data():
 あなたはプロのECコンサルタント育成用コンテンツクリエイターです。
 以下の複数の情報（当日のニュースやトレンド）をもとに、初心者コンサルタント向けの教育コンテンツを一括で作成してください。
 
-【最重要：動的ケーススタディと方程式の連携】
-単にニュースを要約するだけでなく、そのニュース（例：新しい広告機能、SEOの変更、物流費高騰など）が**EC売上の方程式（売上 ＝ アクセス数 × CVR × 客単価）**や、CPA、ROAS、CRM、フルフィルメントの「どの変数に影響を与えるのか」を必ず分析し、それを基にした実践的な**ケーススタディ(case_study)**や**マニュアル(manual)**を生成してください。
-これにより、日々のニュースが「単なる情報」ではなく「常に更新され続ける実戦問題」として蓄積されます。
+【最重要：動的ケーススタディとクイズの絶対生成】
+単にニュースを要約するだけでなく、そのニュースが「EC売上の方程式（アクセス数 × CVR × 客単価）」などの重要KPIにどう影響するかを分析し、**必ず1つ以上のケーススタディ(case_study)と、1つ以上のクイズ(quiz)を新規生成してください。**
+これにより、毎日のニュースが「常に更新され続ける実戦問題集」となります。
 
-以下のJSON配列形式で、作成可能なコンポーネントのみを含めて出力してください。
-Markdownコードブロック(```json)は含めず、純粋なJSON配列のみを出力してください。
+以下のJSON配列形式で出力してください。Markdownコードブロック(```json)は含めず、純粋なJSON配列のみを出力してください。
 
 【重要：テーマ分類】
 manual, quiz, case_study を生成する場合、必ず以下のテーマのいずれか1つを正確に `theme` キーに設定してください。

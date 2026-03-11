@@ -29,76 +29,66 @@ def generate_fundamentals():
         "TikTokshop"
     ]
     
+    sub_themes = [
+        "販促イベントと広告運用（アクセス数最大化）",
+        "CRMと各種施策（CVR・客単価・LTV最大化）"
+    ]
+    
     all_parsed = []
     
     for theme in themes:
-        print(f"  -> Generating for theme: {theme}...")
-        prompt = f"""
-あなたは、EC未経験者や初心者をプロのECコンサルタントに育成するための、最高峰の教育コンテンツクリエイターです。
-ユーザーからは、「最新ニュースではなく、EC運営における公式（売上=訪問数×CVR×客単価、CPA、ROAS等）や、各モールの基礎知識、ルール、専門用語を優先したマニュアル・クイズ・ケーススタディを【網羅的に大量に】作成してほしい」と強い要望を受けています。
+        for sub in sub_themes:
+            print(f"  -> Generating [ {theme} ] x [ {sub} ]...")
+            prompt = f"""
+あなたは、EC未経験者をプロのコンサルタントに育成する最高峰の教育AIです。
+「{theme}」における「{sub}」に特化した、深く実践的で網羅的な基礎知識を作成してください。
 
-今回は以下のテーマに絞って、非常に詳しく、実践的で、初心者が基礎から体系的に学べる**マニュアル（manual）**、**クイズ（quiz）**、**ケーススタディ（case_study）**を作成し、JSON配列として出力してください。
-
-【対象テーマ】
-"{theme}"
-
-【必須網羅項目】
-「EC売上の方程式（アクセス×CVR×客単価）」を軸に、以下の手法をすべて掛け合わせて具体的に解説してください。
-- 販促イベント（楽天スーパーSALE、お買い物マラソン、Qoo10メガ割、Amazonプライムデーなど）
-- 各種広告（楽天RPP、Amazonスポンサープロダクト、Yahoo!プロモーションパッケージなど）
-- クリエイティブ/商品ページ改善（A+コンテンツ、白背景画像、サムネイルABテスト、SEOキーワード最適化など）
-- CRM（LINE配信、メルマガ、同梱物、リピート施策）
-- フルフィルメント/物流（Amazon FBA、Yahoo!優良配送、楽天スーパーロジスティクス等）
-
-【ケーススタディの『更新性と汎用性』】
-case_studyのシナリオは、「もしROASがXXX%で、CVRがYY%に落ちた場合で、〇〇というイベントが控えている」のように、様々な変数のパターンを掛け合わせた実践的な問題を作成してください。読者があらゆるパターンを想定して思考訓練できるような作りにしてください。
-
-【生成ルール】
-- manual, quiz, case_studyをそれぞれ最低3〜4個生成してください。
-- manualの `content` は、単語帳サイズではなく、Markdown形式（見出し `###`、太字 `**`、箇条書き `-` など）をフル活用した深い解説本文にしてください。
-- case_studyの `example_solution` も同様にMarkdownをフル活用して模範解答を論理的に書いてください。
-- すべての出力において `theme` は必ず "{theme}" と完全に一致させてください。
-- 出力は純粋なJSON配列のみとしてください。Markdownコードブロック(```json)は含めないでください。
+【必須条件】
+- 必ず「EC売上の方程式（アクセス×CVR×客単価）」、またはCPA/ROAS等の概念と紐付けて解説・出題してください。
+- manual（マニュアル）、quiz（クイズ）、case_study（ケーススタディ）をそれぞれ最低2〜3個ずつ、合計6〜9個生成してください。
+- manualの `content` と case_studyの `example_solution` は、見出しや箇条書きを用いたリッチなMarkdown形式で、文字数を惜しまず詳細に解説してください。
+- クイズ(quiz)は必ず4つの選択肢(options)を含め、正解(correct_answer)は0〜3の整数にしてください。
+- themeの値は必ず "{theme}" と完全一致させてください（表記ブレNG）。
+- 出力は純粋なJSON配列のみ。Markdownコードブロックは不要です。
 
 【JSON構造の例】
 [
     {{
-        "manual": {{
-            "title": "...",
-            "theme": "{theme}",
-            "category": "...",
-            "content": "...",
-            "original_source": "自社オリジナル作成知識",
-            "tags": ["..."]
-        }}
+        "manual": {{ "title": "...", "theme": "{theme}", "category": "基礎", "content": "Markdown...", "original_source": "自社作成", "tags": ["..."] }}
+    }},
+    {{
+        "quiz": {{ "theme": "{theme}", "question": "...", "options": ["A","B","C","D"], "correct_answer": 0, "explanation": "...", "original_source": "自社作成" }}
     }}
 ]
 """
 
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                response = client.models.generate_content(
-                    model=MODEL_NAME,
-                    contents=prompt,
-                    config=types.GenerateContentConfig(
-                        temperature=0.2,
-                        response_mime_type="application/json",
+            max_retries = 3
+            for attempt in range(max_retries):
+                try:
+                    # Give it a tiny sleep to relieve API burst pressure
+                    time.sleep(1)
+                    response = client.models.generate_content(
+                        model=MODEL_NAME,
+                        contents=prompt,
+                        config=types.GenerateContentConfig(
+                            temperature=0.3,
+                            response_mime_type="application/json",
+                        )
                     )
-                )
-                
-                resp_text = response.text.strip()
-                if resp_text.startswith('```json'): resp_text = resp_text[7:]
-                if resp_text.startswith('```'): resp_text = resp_text[3:]
-                if resp_text.endswith('```'): resp_text = resp_text[:-3]
+                    
+                    resp_text = response.text.strip()
+                    if resp_text.startswith('```json'): resp_text = resp_text[7:]
+                    if resp_text.startswith('```'): resp_text = resp_text[3:]
+                    if resp_text.endswith('```'): resp_text = resp_text[:-3]
 
-                parsed_array = json.loads(resp_text.strip())
-                all_parsed.extend(parsed_array)
-                print(f"     Successfully generated {len(parsed_array)} items for {theme}.")
-                break
-            except Exception as e:
-                print(f"     Error on attempt {attempt+1}: {e}")
-                time.sleep(5)
+                    parsed_array = json.loads(resp_text.strip())
+                    all_parsed.extend(parsed_array)
+                    print(f"     Successfully generated {len(parsed_array)} items.")
+                    break
+                except Exception as e:
+                    print(f"     Error on attempt {attempt+1} for {theme}-{sub}: {e}")
+                    time.sleep(8)
+    
     
     # Process all_parsed
     manuals = []

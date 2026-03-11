@@ -157,7 +157,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let html = '';
             filteredData.forEach((man, index) => {
-                const contentFormatted = typeof marked !== 'undefined' ? marked.parse(man.content) : man.content.replace(/\n/g, '<br>');
+                const safeContent = man.content || "";
+                const contentFormatted = typeof marked !== 'undefined' ? marked.parse(safeContent) : safeContent.replace(/\n/g, '<br>');
                 html += `
                     <div class="flashcard" style="margin-bottom: 1.5rem;" id="manual-fc-${index}">
                         <div class="flashcard-header">
@@ -233,16 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flashcard-header">
                             <div>
                                 <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">${q.theme || '未指定'}</span>
-                                <div class="flashcard-title" style="margin-top: 0.5rem;">Q: ${typeof marked !== 'undefined' ? marked.parseInline(q.question) : q.question}</div>
+                                <div class="flashcard-title" style="margin-top: 0.5rem;">Q: ${typeof marked !== 'undefined' ? marked.parseInline(q.question || "") : (q.question || "")}</div>
                             </div>
                             <div class="flashcard-icon">▼</div>
                         </div>
                         
                         <div class="flashcard-content">
                             <div class="options" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
-                                ${q.options.map((opt, i) => `
+                                ${(q.options || []).map((opt, i) => `
                                     <button class="quiz-option-btn" data-qindex="${index}" data-optindex="${i}" style="padding: 1rem; text-align: left; border: 1px solid var(--border); background: var(--bg-main); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
-                                        ${i + 1}. ${typeof marked !== 'undefined' ? marked.parseInline(opt) : opt}
+                                        ${i + 1}. ${typeof marked !== 'undefined' ? marked.parseInline(opt || "") : (opt || "")}
                                     </button>
                                 `).join('')}
                             </div>
@@ -283,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         </h4>
                         <div style="font-size:0.95rem; line-height: 1.7; color: var(--text-main); margin-bottom: 1rem;">
                             <strong>【解説】</strong><br>
-                            ${typeof marked !== 'undefined' ? marked.parse(quiz.explanation) : quiz.explanation}
+                            ${typeof marked !== 'undefined' ? marked.parse(quiz.explanation || "") : (quiz.explanation || "")}
                         </div>
                         <a href="${quiz.original_source}" target="_blank" class="source-citation" style="display: inline-block;">Source</a>
                     `;
@@ -368,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                             <div class="case-solution-area" id="case-solution-${index}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
                                 <h3 style="color: var(--primary); margin-bottom:0.75rem;">【模範解答・アプローチ例】</h3>
-                                <div style="margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6; font-size: 0.95rem;">${typeof marked !== 'undefined' ? marked.parse(c.example_solution) : c.example_solution}</div>
+                                <div style="margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6; font-size: 0.95rem;">${typeof marked !== 'undefined' ? marked.parse(c.example_solution || "") : (c.example_solution || "")}</div>
                                 
                                 <h4 style="color: var(--text-main); margin-bottom:0.5rem;">【評価ルーブリック】</h4>
                                 <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; line-height: 1.6; font-size: 0.9rem; color: var(--text-muted);">
