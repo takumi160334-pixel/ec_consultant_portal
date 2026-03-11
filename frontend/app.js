@@ -214,36 +214,59 @@ document.addEventListener('DOMContentLoaded', () => {
         const listContainer = container.querySelector('.data-list-container');
 
         function updateList() {
-            const filteredData = currentTheme === 'All' ? quizzesData : quizzesData.filter(q => q.theme === currentTheme);
+            // Filter by theme AND ensure options array exists to prevent crashes
+            const filteredData = quizzesData.filter(q => {
+                const themeMatch = currentTheme === 'All' || q.theme === currentTheme;
+                const hasOptions = q.options && Array.isArray(q.options) && q.options.length > 0;
+                return themeMatch && hasOptions;
+            });
+
             if (filteredData.length === 0) {
-                listContainer.innerHTML = `<p>No quizzes available for this theme.</p>`;
+                listContainer.innerHTML = `<p>No valid quizzes available for this theme.</p>`;
                 return;
             }
 
             let html = '';
             filteredData.forEach((q, index) => {
                 html += `
-                    <div class="card quiz-card" style="margin-bottom: 2rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem;" id="quiz-block-${index}">
-                        <div style="margin-bottom: 0.5rem;"><span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: bold;">${q.theme || '未指定'}</span></div>
-                        <h3 style="margin-bottom: 1rem;">Q${index + 1}: ${q.question}</h3>
-                        <div class="options" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1rem;">
-                            ${q.options.map((opt, i) => `
-                                <button class="quiz-option-btn" data-qindex="${index}" data-optindex="${i}" style="padding: 0.75rem; text-align: left; border: 1px solid var(--border); background: white; border-radius: 0.25rem; cursor: pointer;">
-                                    ${i + 1}. ${opt}
-                                </button>
-                            `).join('')}
+                    <div class="flashcard" style="margin-bottom: 1.5rem;" id="quiz-block-${index}">
+                        <div class="flashcard-header">
+                            <div>
+                                <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">${q.theme || '未指定'}</span>
+                                <div class="flashcard-title" style="margin-top: 0.5rem;">Q: ${typeof marked !== 'undefined' ? marked.parseInline(q.question) : q.question}</div>
+                            </div>
+                            <div class="flashcard-icon">▼</div>
                         </div>
-                        <div class="quiz-result" id="quiz-result-${index}" style="display: none; padding: 1rem; background: #F3F4F6; border-radius: 0.25rem;">
-                            <!-- Result injected here -->
+                        
+                        <div class="flashcard-content">
+                            <div class="options" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+                                ${q.options.map((opt, i) => `
+                                    <button class="quiz-option-btn" data-qindex="${index}" data-optindex="${i}" style="padding: 1rem; text-align: left; border: 1px solid var(--border); background: var(--bg-main); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
+                                        ${i + 1}. ${typeof marked !== 'undefined' ? marked.parseInline(opt) : opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                            <div class="quiz-result" id="quiz-result-${index}" style="display: none; padding: 1.25rem; background: #F3F4F6; border-radius: 0.5rem;">
+                                <!-- Result injected here -->
+                            </div>
                         </div>
                     </div>
                 `;
             });
             listContainer.innerHTML = html;
 
+            // Attach open toggle for Flashcards
+            listContainer.querySelectorAll('.flashcard-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const card = header.closest('.flashcard');
+                    card.classList.toggle('open');
+                });
+            });
+
             // Attach quiz logic
             listContainer.querySelectorAll('.quiz-option-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
                     const qIndex = parseInt(e.target.dataset.qindex);
                     const optIndex = parseInt(e.target.dataset.optindex);
                     const quiz = filteredData[qIndex];
@@ -255,22 +278,26 @@ document.addEventListener('DOMContentLoaded', () => {
                     resultDiv.style.border = `1px solid ${isCorrect ? '#34d399' : '#fca5a5'}`;
 
                     resultDiv.innerHTML = `
-                         <h4 style="color: ${isCorrect ? '#065f46' : '#991b1b'}; margin-bottom: 0.5rem;">
+                         <h4 style="color: ${isCorrect ? '#065f46' : '#991b1b'}; margin-bottom: 0.75rem; font-size: 1.1rem;">
                             ${isCorrect ? '✅ 正解！' : '❌ 不正解...'}
                         </h4>
-                        <p style="font-size:0.95rem; line-height: 1.6;"><strong>解説:</strong> ${quiz.explanation}</p>
-                        <a href="${quiz.original_source}" target="_blank" class="source-citation" style="margin-top: 1rem; display: inline-block;">Source: ${quiz.original_source}</a>
+                        <div style="font-size:0.95rem; line-height: 1.7; color: var(--text-main); margin-bottom: 1rem;">
+                            <strong>【解説】</strong><br>
+                            ${typeof marked !== 'undefined' ? marked.parse(quiz.explanation) : quiz.explanation}
+                        </div>
+                        <a href="${quiz.original_source}" target="_blank" class="source-citation" style="display: inline-block;">Source</a>
                     `;
 
                     // Disable options after answer
                     listContainer.querySelectorAll(`#quiz-block-${qIndex} .quiz-option-btn`).forEach(b => {
                         b.disabled = true;
-                        b.style.opacity = '0.7';
+                        b.style.opacity = '0.6';
                         b.style.cursor = 'default';
                         if (parseInt(b.dataset.optindex) === quiz.correct_answer) {
                             b.style.border = '2px solid #10b981';
                             b.style.backgroundColor = '#ecfdf5';
                             b.style.fontWeight = 'bold';
+                            b.style.opacity = '1';
                         } else if (parseInt(b.dataset.optindex) === optIndex && !isCorrect) {
                             b.style.border = '2px solid #ef4444';
                             b.style.backgroundColor = '#fef2f2';
