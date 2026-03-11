@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EC Consultant Training Portal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="app">
+        <!-- Sidebar Navigation -->
+        <nav id="sidebar">
+            <div class="logo">
+                <h2>EC Training</h2>
+            </div>
+            <ul class="nav-links">
+                <li><a href="#" data-view="dashboard" class="active">Dashboard / News</a></li>
+                <li><a href="#" data-view="manuals">Knowledge base</a></li>
+                <li><a href="#" data-view="quizzes">Skill Quizzes</a></li>
+                <li><a href="#" data-view="cases">Case Studies</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main id="main-content">
+            <!-- Dynamic Content Injected Here -->
+            <div id="view-container">
+                <div class="loading">Loading content...</div>
+            </div>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
