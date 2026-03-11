@@ -157,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let html = '';
             filteredData.forEach(man => {
-                const contentFormatted = man.content.replace(/\n### /g, '<h3>').replace(/\n- /g, '<br>• ').replace(/\n/g, '<br>');
+                const contentFormatted = typeof marked !== 'undefined' ? marked.parse(man.content) : man.content.replace(/\n/g, '<br>');
                 html += `
                     <div class="card manual-card" style="margin-bottom: 2rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem;">
                         <h2>${man.title}</h2>
@@ -176,11 +176,13 @@ document.addEventListener('DOMContentLoaded', () => {
             listContainer.innerHTML = html;
         }
 
-        renderThemeFilters(filterContainer, currentTheme, (newTheme) => {
+        const handleThemeSelect = (newTheme) => {
             currentTheme = newTheme;
-            renderThemeFilters(filterContainer, currentTheme, updateList); // update pills
+            renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
             updateList();
-        });
+        };
+
+        renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
 
         updateList();
     }
@@ -266,11 +268,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        renderThemeFilters(filterContainer, currentTheme, (newTheme) => {
+        const handleThemeSelect = (newTheme) => {
             currentTheme = newTheme;
-            renderThemeFilters(filterContainer, currentTheme, updateList);
+            renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
             updateList();
-        });
+        };
+
+        renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
 
         updateList();
     }
@@ -318,7 +322,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         <div class="case-solution-area" id="case-solution-${index}" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border);">
                             <h3 style="color: var(--primary); margin-bottom:0.75rem;">【模範解答・アプローチ例】</h3>
-                            <div style="white-space: pre-wrap; margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6;">${c.example_solution}</div>
+                            <div style="margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6;">${typeof marked !== 'undefined' ? marked.parse(c.example_solution) : c.example_solution}</div>
                             
                             <h3 style="color: var(--text-main); margin-bottom:0.5rem;">【評価ルーブリック（自己採点用）】</h3>
                             <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">以下の観点で自身の回答を満たせているか確認してください。</p>
@@ -346,11 +350,13 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        renderThemeFilters(filterContainer, currentTheme, (newTheme) => {
+        const handleThemeSelect = (newTheme) => {
             currentTheme = newTheme;
-            renderThemeFilters(filterContainer, currentTheme, updateList);
+            renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
             updateList();
-        });
+        };
+
+        renderThemeFilters(filterContainer, currentTheme, handleThemeSelect);
 
         updateList();
     }
