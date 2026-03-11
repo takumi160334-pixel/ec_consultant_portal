@@ -234,25 +234,38 @@ document.addEventListener('DOMContentLoaded', () => {
                         <div class="flashcard-header">
                             <div>
                                 <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">${q.theme || '未指定'}</span>
-                                <div class="flashcard-title" style="margin-top: 0.5rem;">Q: ${typeof marked !== 'undefined' ? marked.parseInline(q.question || "") : (q.question || "")}</div>
+                                <div class="flashcard-title" style="margin-top: 0.5rem;">Q: ${typeof marked !== 'undefined' ? marked.parseInline(q.question || "問題文がありません") : (q.question || "問題文がありません")}</div>
                             </div>
                             <div class="flashcard-icon">▼</div>
                         </div>
                         
                         <div class="flashcard-content">
-                            <div class="options" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
-                                ${(q.options || []).map((opt, i) => `
-                                    <button class="quiz-option-btn" data-qindex="${index}" data-optindex="${i}" style="padding: 1rem; text-align: left; border: 1px solid var(--border); background: var(--bg-main); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
-                                        ${i + 1}. ${typeof marked !== 'undefined' ? marked.parseInline(opt || "") : (opt || "")}
-                                    </button>
-                                `).join('')}
-                            </div>
-                            <div class="quiz-result" id="quiz-result-${index}" style="display: none; padding: 1.25rem; background: #F3F4F6; border-radius: 0.5rem;">
-                                <!-- Result injected here -->
-                            </div>
+                        ${(q.options && Array.isArray(q.options) && q.options.length > 0) ? `
+                        <div class="options" style="display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.25rem;">
+                            ${q.options.map((opt, i) => `
+                                <button class="quiz-option-btn" data-qindex="${index}" data-optindex="${i}" style="padding: 1rem; text-align: left; border: 1px solid var(--border); background: var(--bg-main); border-radius: 0.5rem; cursor: pointer; transition: all 0.2s; font-size: 0.95rem;">
+                                    ${i + 1}. ${typeof marked !== 'undefined' ? marked.parseInline(opt || "") : (opt || "")}
+                                </button>
+                            `).join('')}
                         </div>
+                        <div class="quiz-result" id="quiz-result-${index}" style="display: none; padding: 1.25rem; background: #F3F4F6; border-radius: 0.5rem;">
+                            <!-- Result injected here -->
+                        </div>
+                        ` : `
+                        <div class="user-input-area" style="margin-bottom: 1rem;">
+                            <button class="btn-reveal-quiz-answer" data-qindex="${index}" style="padding: 0.5rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 999px; cursor: pointer; font-weight: bold; transition: background 0.2s;">解答・解説を表示</button>
+                        </div>
+                        <div class="quiz-result" id="quiz-result-${index}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
+                            <h4 style="color: var(--primary); margin-bottom: 0.75rem; font-size: 1.1rem;">【解答・解説】</h4>
+                            <div style="font-size:0.95rem; line-height: 1.7; color: var(--text-main); margin-bottom: 1rem;">
+                                ${typeof marked !== 'undefined' ? marked.parse(q.explanation || "") : (q.explanation || "")}
+                            </div>
+                            <a href="${q.original_source}" target="_blank" class="source-citation" style="display: inline-block;">Source</a>
+                        </div>
+                        `}
                     </div>
-                `;
+                </div>
+            `;
             });
             listContainer.innerHTML = html;
 
