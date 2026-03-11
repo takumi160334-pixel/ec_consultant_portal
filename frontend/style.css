@@ -166,3 +166,55 @@ body {
     color: var(--text-muted);
     font-weight: 500;
 }
+
+/* Flashcard UI */
+.flashcard {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+    position: relative;
+}
+
+.flashcard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.flashcard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.flashcard-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-right: 1rem;
+    line-height: 1.4;
+}
+
+.flashcard-content {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.flashcard.open .flashcard-content {
+    display: block;
+}
+
+.flashcard-icon {
+    font-size: 1.25rem;
+    color: var(--primary);
+    transition: transform 0.3s;
+}
+
+.flashcard.open .flashcard-icon {
+    transform: rotate(180deg);
+}

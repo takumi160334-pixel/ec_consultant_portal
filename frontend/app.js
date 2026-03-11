@@ -156,24 +156,36 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             let html = '';
-            filteredData.forEach(man => {
+            filteredData.forEach((man, index) => {
                 const contentFormatted = typeof marked !== 'undefined' ? marked.parse(man.content) : man.content.replace(/\n/g, '<br>');
                 html += `
-                    <div class="card manual-card" style="margin-bottom: 2rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem;">
-                        <h2>${man.title}</h2>
-                        <div style="margin-bottom: 1rem; color: var(--text-muted); font-size: 0.875rem;">
-                            <strong>テーマ:</strong> <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold;">${man.theme || '未指定'}</span> | <strong>カテゴリー:</strong> ${man.category}
+                    <div class="flashcard" style="margin-bottom: 1.5rem;" id="manual-fc-${index}">
+                        <div class="flashcard-header">
+                            <div>
+                                <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">${man.theme || '未指定'}</span>
+                                <div class="flashcard-title">${man.title}</div>
+                            </div>
+                            <div class="flashcard-icon">▼</div>
                         </div>
-                        <div class="manual-content" style="margin-bottom: 1rem;">
-                            ${contentFormatted}
+                        <div class="flashcard-content">
+                            <div class="manual-content" style="margin-bottom: 1rem; font-size: 0.95rem; line-height: 1.7;">
+                                ${contentFormatted}
+                            </div>
+                            <a href="${man.original_source && man.original_source.includes('http') ? man.original_source.match(/https?:\/\/[^\s]+/) : '#'}" class="source-citation" target="_blank">
+                                Source
+                            </a>
                         </div>
-                        <a href="${man.original_source.includes('http') ? man.original_source.match(/https?:\/\/[^\s]+/) : '#'}" class="source-citation" target="_blank">
-                            Source: ${man.original_source}
-                        </a>
                     </div>
                 `;
             });
             listContainer.innerHTML = html;
+
+            listContainer.querySelectorAll('.flashcard').forEach(card => {
+                const header = card.querySelector('.flashcard-header');
+                header.addEventListener('click', () => {
+                    card.classList.toggle('open');
+                });
+            });
         }
 
         const handleThemeSelect = (newTheme) => {
@@ -303,49 +315,62 @@ document.addEventListener('DOMContentLoaded', () => {
             let html = '';
             filteredData.forEach((c, index) => {
                 html += `
-                    <div class="card case-card" style="margin-bottom: 2rem; border: 1px solid var(--border); padding: 1.5rem; border-radius: 0.5rem;" id="case-block-${index}">
-                        <div style="margin-bottom: 0.5rem;"><span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-size: 0.8rem; font-weight: bold;">${c.theme || '未指定'}</span></div>
-                        <h2 style="margin-bottom: 0.5rem;">${c.title}</h2>
-                        <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: #EEF2FF; border-left: 4px solid var(--primary); border-radius: 0 0.25rem 0.25rem 0;">
-                            <strong>【シナリオ】</strong><br>
-                            ${c.scenario}
-                        </div>
-                        <div style="margin-bottom: 1.5rem; font-size: 1.1rem; font-weight: 500;">
-                            <strong>【設問】</strong><br>
-                            ${c.question}
+                    <div class="flashcard" style="margin-bottom: 1.5rem;" id="case-block-${index}">
+                        <div class="flashcard-header">
+                            <div>
+                                <span style="background: #E0E7FF; color: #3730A3; padding: 0.2rem 0.5rem; border-radius: 0.25rem; font-weight: bold; font-size: 0.75rem; margin-bottom: 0.5rem; display: inline-block;">${c.theme || '未指定'}</span>
+                                <div class="flashcard-title">${c.title}</div>
+                            </div>
+                            <div class="flashcard-icon">▼</div>
                         </div>
                         
-                        <div class="user-input-area" id="case-input-area-${index}" style="margin-bottom: 1rem;">
-                             <textarea style="width: 100%; min-height: 150px; padding: 1rem; border: 1px solid var(--border); border-radius: 0.25rem; font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="ここに自身の考え（構造化された仮説やアプローチ）を論理的に書き出してください..."></textarea>
-                            <button class="btn-reveal-answer" data-cindex="${index}" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 999px; cursor: pointer; font-weight: bold; transition: background 0.2s;">解答・解説を確認する</button>
-                        </div>
+                        <div class="flashcard-content">
+                            <div style="margin-bottom: 1.5rem; padding: 1.25rem; background: #EEF2FF; border-left: 4px solid var(--primary); border-radius: 0 0.25rem 0.25rem 0;">
+                                <strong>【シナリオ】</strong><br>
+                                ${typeof marked !== 'undefined' ? marked.parse(c.scenario || "") : c.scenario}
+                            </div>
+                            <div style="margin-bottom: 1.5rem; font-size: 1.05rem; font-weight: 500;">
+                                <strong>【設問】</strong><br>
+                                ${typeof marked !== 'undefined' ? marked.parse(c.question || "") : c.question}
+                            </div>
+                            
+                            <div class="user-input-area" id="case-input-area-${index}" style="margin-bottom: 1rem;">
+                                 <textarea style="width: 100%; min-height: 100px; padding: 1rem; border: 1px solid var(--border); border-radius: 0.25rem; font-family: inherit; font-size: 0.95rem; resize: vertical;" placeholder="ここに自身のアプローチを書き出してください..."></textarea>
+                                <button class="btn-reveal-answer" data-cindex="${index}" style="margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 999px; cursor: pointer; font-weight: bold; transition: background 0.2s;">解答・解説を表示</button>
+                            </div>
 
-                        <div class="case-solution-area" id="case-solution-${index}" style="display: none; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px dashed var(--border);">
-                            <h3 style="color: var(--primary); margin-bottom:0.75rem;">【模範解答・アプローチ例】</h3>
-                            <div style="margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6;">${typeof marked !== 'undefined' ? marked.parse(c.example_solution) : c.example_solution}</div>
-                            
-                            <h3 style="color: var(--text-main); margin-bottom:0.5rem;">【評価ルーブリック（自己採点用）】</h3>
-                            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 0.5rem;">以下の観点で自身の回答を満たせているか確認してください。</p>
-                            <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; line-height: 1.6;">
-                                ${(c.evaluation_rubric || []).map(r => `<li>${r}</li>`).join('')}
-                            </ul>
-                            
-                            <a href="${c.original_source}" target="_blank" class="source-citation">Original Source &rarr;</a>
+                            <div class="case-solution-area" id="case-solution-${index}" style="display: none; margin-top: 1rem; padding-top: 1rem; border-top: 1px dashed var(--border);">
+                                <h3 style="color: var(--primary); margin-bottom:0.75rem;">【模範解答・アプローチ例】</h3>
+                                <div style="margin-bottom: 1.5rem; background: var(--bg-main); padding: 1.25rem; border-radius: 0.5rem; line-height: 1.6; font-size: 0.95rem;">${typeof marked !== 'undefined' ? marked.parse(c.example_solution) : c.example_solution}</div>
+                                
+                                <h4 style="color: var(--text-main); margin-bottom:0.5rem;">【評価ルーブリック】</h4>
+                                <ul style="margin-bottom: 1.5rem; padding-left: 1.5rem; line-height: 1.6; font-size: 0.9rem; color: var(--text-muted);">
+                                    ${(c.evaluation_rubric || []).map(r => `<li>${r}</li>`).join('')}
+                                </ul>
+                                
+                                <a href="${c.original_source}" target="_blank" class="source-citation">Original Source &rarr;</a>
+                            </div>
                         </div>
                     </div>
                 `;
             });
             listContainer.innerHTML = html;
 
+            listContainer.querySelectorAll('.flashcard-header').forEach(header => {
+                header.addEventListener('click', (e) => {
+                    const card = header.closest('.flashcard');
+                    card.classList.toggle('open');
+                });
+            });
+
             listContainer.querySelectorAll('.btn-reveal-answer').forEach(btn => {
                 btn.addEventListener('click', (e) => {
+                    e.stopPropagation(); // prevent closing flashcard
                     const cIndex = e.target.dataset.cindex;
                     const solutionDiv = listContainer.querySelector(`#case-solution-${cIndex}`);
                     solutionDiv.style.display = 'block';
-                    e.target.style.display = 'none'; // Hide button
-
-                    // Show a nice success feeling
-                    solutionDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    e.target.style.display = 'none';
+                    solutionDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
                 });
             });
         }
